@@ -20,11 +20,6 @@ export default {
     const formatFiles = normalizedFiles.filter(({ path }) =>
       /\.(ts|tsx|json|md|css|html)$/.test(path),
     );
-    const shouldBuild = normalizedFiles.some(({ path }) =>
-      /^(apps\/web\/.*\.(ts|tsx)|apps\/web\/(package|tsconfig)\.json|apps\/web\/vite\.config\.ts|packages\/ui\/.*\.(ts|tsx)|packages\/ui\/package\.json|packages\/typescript-config\/.*\.json)$/.test(
-        path,
-      ),
-    );
     const commands = [];
 
     if (formatFiles.length > 0) {
@@ -43,10 +38,6 @@ export default {
       commands.push(
         `pnpm --filter @repo/ui exec eslint --fix ${uiSources.map(({ file }) => quote(file)).join(" ")}`,
       );
-    }
-
-    if (shouldBuild) {
-      commands.push("pnpm --filter web build");
     }
 
     return commands;
