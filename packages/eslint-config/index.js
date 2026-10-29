@@ -8,6 +8,12 @@ module.exports = tseslint.config(
   ...tseslint.configs.recommended,
   eslintConfigPrettier,
   {
+    rules: {
+      "no-unused-vars": "warn",
+      "@typescript-eslint/no-unused-vars": "warn",
+    },
+  },
+  {
     plugins: {
       "react-hooks": reactHooks,
     },
