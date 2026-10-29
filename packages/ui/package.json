@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "exports": {
     ".": "./index.ts",
-    "./fetchJSON": "./resources/fetchJSON.ts"
+    "./fetchJSON": "./resources/fetchJSON.ts",
+    "./types": "./components/types.ts"
   },
   "license": "MIT",
   "scripts": {
