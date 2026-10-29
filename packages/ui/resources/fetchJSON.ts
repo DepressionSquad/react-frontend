@@ -1,16 +1,17 @@
+type JsonRequestInit = Omit<RequestInit, "body"> & {
+  body?: unknown;
+};
+
 const fetchJSON = async <T = unknown>(
   url: string,
-  options: RequestInit,
+  options: JsonRequestInit,
 ): Promise<T> => {
   // const session = await getSessionCookie();
 
-  const { headers = {} } = options;
-  const { body } = options;
-  delete options.headers;
-  delete options.body;
+  const { headers = {}, body, ...requestOptions } = options;
 
   const res = await fetch(url, {
-    method: options.method,
+    ...requestOptions,
     headers: {
       "Content-Type": "application/json",
       // ...(session.jwt && {
@@ -19,7 +20,6 @@ const fetchJSON = async <T = unknown>(
       ...headers,
     },
     body: JSON.stringify(body),
-    ...options,
   });
 
   if (!res.ok) {
@@ -32,7 +32,7 @@ const fetchJSON = async <T = unknown>(
 
 export const post = async <T = unknown>(
   url: string,
-  body: RequestInit["body"],
+  body: unknown,
   options?: RequestInit,
 ): Promise<T> => {
   return await fetchJSON<T>(url, { method: "POST", body, ...options });
@@ -40,10 +40,10 @@ export const post = async <T = unknown>(
 
 export const put = async <T = unknown>(
   url: string,
-  body: RequestInit["body"],
+  body: unknown,
   options?: RequestInit,
 ): Promise<T> => {
-  return await fetchJSON(url, { method: "PUT", body, ...options });
+  return await fetchJSON<T>(url, { method: "PUT", body, ...options });
 };
 
 export const get = async <T = unknown>(
@@ -58,4 +58,23 @@ export const _delete = async <T = unknown>(
   options?: RequestInit,
 ): Promise<T> => {
   return await fetchJSON(url, { method: "DELETE", ...options });
+};
+
+export const getParamsString = (params: Record<string, unknown>) => {
+  const urlParams = new URLSearchParams();
+
+  const flattenParams = (obj: object, prefix = "") => {
+    for (const [key, value] of Object.entries(obj)) {
+      const propName = prefix ? `${prefix}[${key}]` : key;
+      if (typeof value === "object" && value !== null) {
+        flattenParams(value, propName);
+      } else {
+        urlParams.append(propName, String(value));
+      }
+    }
+  };
+
+  flattenParams(params);
+
+  return urlParams.toString();
 };
